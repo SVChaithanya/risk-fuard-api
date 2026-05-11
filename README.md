@@ -1,138 +1,118 @@
-# 🚀 RiskGuard API — Real-Time Fraud Detection Engine
+# RiskGuard Fraud API 🚨
 
-RiskFuard API is a production-ready backend system for **real-time financial fraud detection**.
-It combines **machine learning predictions** with **rule-based risk scoring** (amount, velocity, time-gap) to make intelligent transaction decisions.
+A production-ready fraud detection backend built with FastAPI, PostgreSQL, and Machine Learning (XGBoost).
 
----
-
-## 🔥 Key Features
-
-* ⚡ **Real-Time Fraud Detection**
-
-  * Predicts fraud probability using trained ML model (XGBoost + calibration)
-
-* 🧠 **Hybrid Decision Engine**
-
-  * Combines:
-
-    * ML probability
-    * Transaction amount risk
-    * Velocity (transactions per minute)
-    * Time-gap behavior
-
-* 🛡️ **Dynamic Risk Decisions**
-
-  * APPROVED
-  * REVIEW
-  * REJECTED
-
-* 📊 **Transaction History Tracking**
-
-  * Time-based behavior analysis
-  * Fraud probability monitoring
-
-* 🔐 **Authentication System**
-
-  * JWT-based login & secure endpoints
-
-* 🐳 **Dockerized Deployment**
-
-  * Fully containerized with PostgreSQL
-  * Ready for AWS EC2 deployment
+This system analyzes financial transactions in real-time using a combination of:
+- Machine Learning (fraud probability)
+- Behavioral rules (velocity, amount, time-gap)
+- Risk scoring engine
 
 ---
 
-## 🧠 System Architecture
+## 🔥 Features
 
-```text
-Client → FastAPI Backend → ML Model → Decision Engine → PostgreSQL
+- ✅ Real-time fraud prediction (XGBoost + calibrated probabilities)
+- ✅ Hybrid decision system (ML + rule-based risk scoring)
+- ✅ Transaction velocity detection (rapid activity tracking)
+- ✅ Time-gap fraud analysis
+- ✅ Rate limiting (transaction count + amount control)
+- ✅ JWT Authentication (secure user access)
+- ✅ PostgreSQL database integration
+- ✅ Dockerized deployment (ready for AWS EC2)
+
+---
+
+## 🧠 How It Works
+
+### 1. Transaction Input
+User submits:
+- Amount
+- Time (auto-generated)
+- PCA features (V1–V28)
+
+### 2. ML Prediction
+Model returns fraud probability:
 ```
 
----
-
-## ⚙️ Tech Stack
-
-* **Backend:** FastAPI
-* **Database:** PostgreSQL
-* **ORM:** SQLAlchemy
-* **ML Model:** XGBoost + Scikit-learn (Calibrated)
-* **Auth:** JWT (python-jose, bcrypt)
-* **Containerization:** Docker + Docker Compose
-* **Deployment:** AWS EC2
-
----
-
-## 🧪 Fraud Detection Logic
-
-Each transaction is evaluated using:
-
-### 1. ML Probability
-
-* Predicts likelihood of fraud
-
-### 2. Rule-Based Risk Factors
-
-* High transaction amount
-* Rapid transaction frequency (velocity)
-* Short time gap between transactions
-
-### 3. Final Risk Score
-
-```text
-Low Risk → APPROVED  
-Medium Risk → REVIEW  
-High Risk → REJECTED  
-```
-
----
-
-## 📂 Project Structure
+0.0001 → low risk
+0.01   → medium risk
+0.1+   → high risk
 
 ```
-fraudiq/
-│
-├── app/
-│   ├── main.py
-│   ├── db.py
-│   ├── models.py
-│   ├── schemas.py
+
+### 3. Risk Engine
+System calculates:
+- ML risk score
+- Transaction amount risk
+- Velocity (transactions per minute)
+- Time-gap between transactions
+
+### 4. Final Decision
+| Score | Decision |
+|------|---------|
+| ≥ 90 | REJECTED |
+| ≥ 50 | REVIEW |
+| < 50 | APPROVED |
+
+---
+
+## 🏗️ Tech Stack
+
+- **Backend:** FastAPI
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy
+- **Auth:** JWT (OAuth2)
+- **ML Model:** XGBoost + Scikit-learn
+- **Containerization:** Docker
+- **Deployment:** AWS EC2
+
+---
+
+## 📁 Project Structure
+
+```
+
+.
+├── router/
 │   ├── auth.py
-│   ├── router/
-│   │   └── transaction.py
-│
+│   ├── transaction.py
+├── models.py
+├── schemas.py
+├── db.py
+├── auth.py
 ├── model_v2.pkl
 ├── features.pkl
 ├── Dockerfile
 ├── docker-compose.yml
-├── requirements.txt
-```
+└── main.py
+
+````
 
 ---
 
-## 🐳 Running with Docker
+## 🚀 Setup Instructions
 
 ### 1. Clone Repository
-
 ```bash
-git clone (https://github.com/SVChaithanya/risk-fuard-api)
-cd riskguard-api
-```
+git clone https://github.com/SVChaithanya/riskguard-fraud-api.git
+cd riskguard-fraud-api
+````
 
-### 2. Run Containers
+### 2. Run with Docker
 
 ```bash
 docker-compose up --build
 ```
 
-### 3. Access API
+App runs at:
 
-```text
-http://localhost:8000/docs
+```
+http://localhost:8000
 ```
 
 ---
 
-## 🔑 API Endpoints
+## 🔐 API Endpoints
 
 ### Auth
 
@@ -141,8 +121,8 @@ http://localhost:8000/docs
 
 ### Transactions
 
-* `POST /transactions/` → Create transaction + fraud prediction
-* `GET /transactions/history` → View transaction history
+* `POST /transactions/` → Create transaction
+* `GET /transactions/history` → View history
 
 ---
 
@@ -150,30 +130,47 @@ http://localhost:8000/docs
 
 ```json
 {
-  "transaction_id": "abc123",
+  "transaction_id": "uuid",
   "amount": 21900,
   "time_gap_sec": 5,
   "fraud_probability": 0.017,
-  "tx_count_1m": 4,
   "decision": "REVIEW"
 }
 ```
 
 ---
 
-## 🚀 Future Improvements
+## ⚠️ Key Insights
 
-* 🔁 Redis-based rate limiting
-* 📈 Real-time monitoring dashboard
-* ☁️ Load balancing (Nginx / K3s)
-* 🔗 Integration with credit risk (LoanIQ)
-
----
-
-## ⚠️ Note
-
-This project is built for **learning + demonstration purposes**, but follows real-world backend architecture patterns used in fintech systems.
+* Fraud probability is **very low (0.001–0.02)** due to dataset imbalance
+* Decision is **NOT based only on ML**
+* Rule engine is critical for realistic fraud detection
 
 ---
 
+## 🧪 Model Performance
 
+* ROC-AUC: **0.98+**
+* Highly imbalanced dataset handled using:
+
+  * `scale_pos_weight`
+  * Probability calibration
+
+---
+
+## 🛠️ Future Improvements
+
+* Redis-based rate limiting (distributed)
+* Real-time streaming (Kafka)
+* Dashboard (React + charts)
+* Multi-bank risk scoring system
+* Model retraining pipeline
+
+---
+
+## 👨‍💻 Author
+
+**Surya (SVChaithanya)**
+Backend Developer | ML Systems Builder
+
+---
